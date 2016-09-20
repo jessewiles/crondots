@@ -8,6 +8,7 @@ import (
 	"regexp"
 )
 
+// Page : Object for content related to a wiki page.
 type Page struct {
 	Title string
 	Body  []byte
