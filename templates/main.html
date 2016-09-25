@@ -4,42 +4,30 @@
         <title> Crondots: Linear time modeling </title>
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <style>
+            body {
+                margin: 0.8em;
+            }
+        </style>
     </head>
 
     <body>
-        <h2> Crondots: Linear time modeling </h2>
-        <p>
-            Nada: {{.Nada}}
-        </p>
+        <h2> Crondots: Linear time modeling </h2>'
+        <div id="content">
+            <p>
+                Nada: {{.Nada}}
+            </p>
+            <div id="index"></div>
+        </div>
+
         <div id="visualization"></div>
 
-        <!-- Load some scripts -->
-        <script type="text/javascript" src="/static/js/main.js"> </script>
-        <script type="text/javascript"
-                src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"> </script>
-        <script src="https://code.jquery.com/jquery-3.1.1.min.js"
-                integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-                crossorigin="anonymous"></script>
-        <script type="text/javascript">
-        // DOM element where the Timeline will be attached
-        var container = document.getElementById('visualization');
+        <!-- Load require -->
+        <script data-main="static/app" src="static/lib/require.js"></script>
 
-        // Create a DataSet (allows two way data-binding)
-        var items = new vis.DataSet([
-            {id: 1, content: 'item 1', start: '2013-04-20'},
-            {id: 2, content: 'item 2', start: '2013-04-14'},
-            {id: 3, content: 'item 3', start: '2013-04-18'},
-            {id: 4, content: 'item 4', start: '2013-04-16', end: '2013-04-19'},
-            {id: 5, content: 'item 5', start: '2013-04-25'},
-            {id: 6, content: 'item 6', start: '2013-04-27'}
-        ]);
-
-        // Configuration for the Timeline
-        var options = {};
-
-        // Create a Timeline
-        var timeline = new vis.Timeline(container, items, options);
+        <script id="home" type="text/x-handlebars-template">
+          <p> Welcome to crondots.  This site is dedicated to the creation of timelines from various sources.
         </script>
-
     </body>
 </html>
