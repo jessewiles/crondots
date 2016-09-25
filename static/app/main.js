@@ -1,4 +1,7 @@
 require(['jquery', 'vis', 'handlebars'], function($, vis, Hb) {
+    if (localStorage.getItem('tlitems') === null) {
+        localStorage.setItem('tlitems', Json.stringify([]));
+    }
     var render = function(dotsid) {
             // DOM element where the Timeline will be attached
             var dots = JSON.parse(localStorage.getItem(dotsid));
