@@ -9,25 +9,41 @@
             body {
                 margin: 0.8em;
             }
+            .timeline-title {
+                text-align: center;
+            }
         </style>
     </head>
 
     <body>
-        <h2> Crondots: Linear time modeling </h2>'
+        <h2> Crondots: Linear time modeling </h2>
         <div id="content">
             <p>
-                Nada: {{.Nada}}
+                Nada: [[.Nada]]
             </p>
             <div id="index"></div>
         </div>
 
-        <div id="visualization"></div>
-
         <!-- Load require -->
         <script data-main="static/app" src="static/lib/require.js"></script>
 
-        <script id="home" type="text/x-handlebars-template">
-          <p> Welcome to crondots.  This site is dedicated to the creation of timelines from various sources.
+        <script id="home-template" type="text/x-handlebars-template">
+          <p> Welcome to crondots.  This site is dedicated to the creation of timelines from various sources.</p>
+          <ul>
+              {{#each timelines}}
+              <li><a href="#/{{this}}">{{this}}</a></li>
+              {{/each}}
+          </ul>
+        </script>
+
+        <script id="timeline-template" type="text/x-handlebars-template">
+          <h5 class="timeline-title"> {{title}} </h5>
+          <div>
+              <a href="#/home">Home</a>
+              <span> | </span>
+              <a href="#/{{id}}/edit">Edit</a>
+          </div>
+          <div class="timeline"></div>
         </script>
     </body>
 </html>

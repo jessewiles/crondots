@@ -1,13 +1,11 @@
-require(['jquery', 'vis', 'handlebars'], function($, vis, Hb) {
-    if (localStorage.getItem('tlitems') === null) {
-        localStorage.setItem('tlitems', JSON.stringify([]));
-    }
+require(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model) {
     var render = function(dotsid) {
             // DOM element where the Timeline will be attached
             var dots = JSON.parse(localStorage.getItem(dotsid));
 
-            var container = $('#visualization');
-            container.html('');
+            var container = $('.timeline').first();
+            if (container !== null)
+                container.html('');
             
             // Create a DataSet (allows two way data-binding)
             var items = new vis.DataSet(dots);
@@ -17,28 +15,29 @@ require(['jquery', 'vis', 'handlebars'], function($, vis, Hb) {
 
             // Create a Timeline
             var timeline = new vis.Timeline(container[0], items, options);
-        },
-        stls = localStorage.getItem('tlitems'),
-        tls = JSON.parse(stls);
-
-    $('#index').html(function() {
-        result = ['<ul>'];
-        for (var i = 0; i < tls.length; i++) {
-            result.push('<li><a class="inline" href="#/'+tls[i]+'">' +tls[i]+ '</a></li>');
-        }
-        result.push('</ul>');
-        return result.join('\n');
-    }());
+        };
 
     $(document).ready(function() {
         window.onhashchange = function(e) {
             switch(window.location.hash) {
                 case '#/home':
-                    var tmpl = Hb.compile($('#home').html());
-                    $('#content').html(tmpl({}));
+                    var tmpl = Hb.compile($('#home-template').html());
+                    $('#content').html(
+                        tmpl({
+                            timelines: model.timelines()
+                        })
+                    );
                     break;
                 default:
+                    var tmpl = Hb.compile($('#timeline-template').html());
+                    $('#content').html(
+                        tmpl({
+                            title: window.location.hash.substring(2),
+                            id: window.location.hash.substring(2)
+                        })
+                    );
                     render(window.location.hash.substring(2));
+
                     break;
             }
         }

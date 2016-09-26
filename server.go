@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"log"
 )
 
 type FrontPage struct {
@@ -10,8 +11,18 @@ type FrontPage struct {
 }
 
 func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("templates/main.html")
-    t.Execute(w, &FrontPage{Nada: "scoobie"})
+	t, err := template.New("main.html").Delims("[[", "]]").ParseFiles("templates/main.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+    log.Print(t)
+    err = t.Execute(w, &FrontPage{Nada: "scoobie"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	//t, _ := template.ParseFiles("templates/main.html")
+	//t.Execute(w, &FrontPage{Nada: "scoobie"})
 }
 
 func main()  {
