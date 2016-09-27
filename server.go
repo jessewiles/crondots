@@ -15,14 +15,11 @@ func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-    log.Print(t)
+
     err = t.Execute(w, &FrontPage{Nada: "scoobie"})
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	//t, _ := template.ParseFiles("templates/main.html")
-	//t.Execute(w, &FrontPage{Nada: "scoobie"})
 }
 
 func main()  {
