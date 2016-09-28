@@ -20,31 +20,26 @@
 
     <body>
         <h2> Crondots: Linear time modeling </h2>
-        <div id="content">
-            <p>
-                Nada: [[.Nada]]
-            </p>
-            <div id="index"></div>
-        </div>
+        <div id="content"> </div>
 
         <!-- Load require -->
         <script data-main="static/app" src="static/lib/require.js"></script>
 
-        <script id="home-template" type="text/x-handlebars-template">
+        <script id="t-home" type="text/x-handlebars-template">
           <p> Welcome to crondots.  This site is dedicated to the creation of timelines from various sources.</p>
           <ul>
               {{#each timelines}}
-              <li><a href="#/{{this}}">{{this}}</a></li>
+              <li><a href="#/view/{{this}}">{{this}}</a></li>
               {{/each}}
           </ul>
         </script>
 
-        <script id="timeline-template" type="text/x-handlebars-template">
+        <script id="t-timeline" type="text/x-handlebars-template">
           <h5 class="timeline-title"> {{title}} </h5>
           <div class="banner actions">
               <a href="#/home">Home</a>
               <span> | </span>
-              <a href="#/{{id}}/edit">Edit</a>
+              <a href="#/edit/{{id}}">Edit</a>
           </div>
           <div class="timeline"></div>
         </script>

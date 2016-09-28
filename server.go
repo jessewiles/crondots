@@ -2,8 +2,8 @@ package main
 
 import (
 	"html/template"
-	"net/http"
 	"log"
+	"net/http"
 )
 
 type FrontPage struct {
@@ -16,15 +16,15 @@ func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-    err = t.Execute(w, &FrontPage{Nada: "scoobie"})
+	err = t.Execute(w, &FrontPage{Nada: "scoobie"})
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func main()  {
+func main() {
 	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/",  http.StripPrefix("/static", fs))
+	http.Handle("/static/", http.StripPrefix("/static", fs))
 	http.HandleFunc("/", siteIndexHandler)
-    http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", nil)
 }
