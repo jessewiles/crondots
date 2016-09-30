@@ -1,0 +1,29 @@
+body {
+    margin: 0.8em;
+}
+.timeline-title {
+    text-align: center;
+}
+.banner.actions {
+    text-align: right;
+    margin-bottom: 1em;
+}
+.dots {
+    text-align: left;
+    padding: 1em;
+    margin: 1em;
+    font-size: larger;
+    border: 1px solid #bbb;
+}
+.dot {
+    display: inline-block;
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid lightblue;
+    border-radius: 10px;
+    width: 250px;
+    max-width: 250px;
+}
+.content, .start, .end {
+    margin: 1em;
+}

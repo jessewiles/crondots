@@ -5,17 +5,7 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-        <style>
-            body {
-                margin: 0.8em;
-            }
-            .timeline-title {
-                text-align: center;
-            }
-            .banner.actions {
-                text-align: right;
-            }
-        </style>
+        <link rel="stylesheet" href="static/css/main.css" />
     </head>
 
     <body>
@@ -34,7 +24,7 @@
           </ul>
         </script>
 
-        <script id="t-timeline" type="text/x-handlebars-template">
+        <script id="t-view" type="text/x-handlebars-template">
           <h5 class="timeline-title"> {{title}} </h5>
           <div class="banner actions">
               <a href="#/home">Home</a>
@@ -42,6 +32,30 @@
               <a href="#/edit/{{id}}">Edit</a>
           </div>
           <div class="timeline"></div>
+        </script>
+
+        <script id="t-edit" type="text/x-handlebars-template">
+          <h5 class="timeline-title"> Edit: {{title}}
+          <div class="banner actions">
+              <a href="#/home">Home</a>
+              <span> | </span>
+              <a href="#/view/{{id}}">View</a>
+              <span> | </span>
+              <a href="#/save/{{id}}">Save</a>
+          </div>
+          <div class="timeline"></div>
+          <div class="dots">
+            {{#each dots}}
+            <div id="dotid-{{id}}" class="dot row">
+              <div><b>Content:</b></div>
+              <div class="content" contenteditable>{{content}}</div>
+              <div><b>Start:</b></div>
+              <div class="start" contenteditable>{{start}}</div>
+              <div><b>End:</b></div>
+              <div class="end" contenteditable>{{end}}</div>
+            </div>
+            {{/each}}
+          </div>
         </script>
     </body>
 </html>

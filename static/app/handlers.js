@@ -33,7 +33,7 @@ define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model)
         },
         viewHandler: function(routeMatch) {
             $('#content').html(
-                hb_templates['t-timeline']({
+                hb_templates['t-view']({
                     title: routeMatch[1],
                     id: routeMatch[1] 
                 })
@@ -43,9 +43,12 @@ define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model)
         editHandler: function(routeMatch) {
             $('#content').html(
                 hb_templates['t-edit']({
-                    id: 'xxx'
+                    title: routeMatch[1],
+                    id: routeMatch[1],
+                    dots: model.timeline(routeMatch[1])
                 })
             );
+            render(routeMatch[1]);
         },
         HbTemplates: hb_templates
     }
