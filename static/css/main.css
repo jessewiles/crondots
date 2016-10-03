@@ -27,3 +27,11 @@ body {
 .content, .start, .end {
     margin: 1em;
 }
+.editable {
+    margin: 1em;
+    padding: 0.5em;
+}
+#add-button {
+    float: right;
+    margin-right: 30%;
+}

@@ -50,6 +50,38 @@ define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model)
             );
             render(routeMatch[1]);
         },
+        saveHandler: function(routeMatch) {
+            console.log(routeMatch[1]);
+            var dots = [];
+            $('.dots .dot').each(function(index, jq) {
+                var $jq = $(jq), 
+                    $content = $jq.find('.content').first(),
+                    $start = $jq.find('.start').first(),
+                    $end = $jq.find('.end').first(),
+                    dot = {
+                        id: $jq.attr('id').split('-')[1]
+                    };
+                if ($content.text().length > 0) 
+                    dot.content = $content.text();
+                if ($start.text().length > 0) 
+                    dot.start = $start.text();
+                if ($end.text().length > 0) 
+                    dot.end = $end.text();
+                else 
+                    dot.type = 'point';
+                if ($jq.attr('id').indexOf('add') === -1) 
+                    dots.push(dot);
+            });
+            model.timeline(routeMatch[1], dots);
+            document.location.hash = '#/view/' + routeMatch[1];
+        },
+        addHandler: function(routeMatch) {
+
+        },
+        deleteHandler: function(routeMatch) {
+            $('#delete-modal').modal('show');
+            $('#delete-timeline').attr('data-tid', routeMatch[1]);
+        },
         HbTemplates: hb_templates
     }
 });

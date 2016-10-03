@@ -4,11 +4,15 @@
 // except for 'app' ones, which are in a sibling
 // directory.
 requirejs.config({
+    shim : {
+        bootstrap : { deps :['jquery'] }
+    },
     baseUrl: 'static/lib',
     paths: {
         jquery: 'jquery-3.1.1',
         handlebars: 'handlebars.amd',
         vis: 'vis.min',
+        bootstrap: '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
         app: '../app'
     }
 });

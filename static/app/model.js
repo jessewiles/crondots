@@ -1,23 +1,47 @@
 define(function() {
     return {
-        timelines: function() {
+        timelines: function(name) {
             try {
-                return JSON.parse(localStorage.getItem('timelines'));
+                var timelines = JSON.parse(localStorage.getItem('timelines'));
+                if (name !== undefined) {
+                    timelines.push(name);
+                    localStorage.setItem('timelines', JSON.stringify(timelines));
+                    this.timeline(name, []);
+                }
+                else {
+                    return timelines;
+                }
             }
             catch(e) {
                 return [];
             }
         },
         timeline: function(name, value) {
+            if (name === undefined)
+                throw 'Must pass a name argument to this function';
+            var result = {},
+                oldTimelines = this.timelines();
             if (value !== undefined) {
                 localStorage.setItem(name, JSON.stringify(value));
             }
             try {
-                return JSON.parse(localStorage.getItem(name));
+                result = JSON.parse(localStorage.getItem(name));
             }
             catch(e) {
-                return {};
+                return result;
             }
+            result.delete = function() {
+                if (name !== undefined) {
+                    var newTimelines = [];
+                    localStorage.removeItem(name);
+                    for (var i = 0; i < oldTimelines.length; i++) {
+                        if (oldTimelines[i] !== name)
+                            newTimelines.push(oldTimelines[i]);
+                    }
+                    localStorage.setItem('timelines', JSON.stringify(newTimelines));
+                }
+            };
+            return result;
         }
     }
 });
