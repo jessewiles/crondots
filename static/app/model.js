@@ -2,7 +2,7 @@ define(function() {
     return {
         timelines: function(name) {
             try {
-                var timelines = JSON.parse(localStorage.getItem('timelines'));
+                var timelines = JSON.parse(localStorage.getItem('timelines')) || [];
                 if (name !== undefined) {
                     timelines.push(name);
                     localStorage.setItem('timelines', JSON.stringify(timelines));
