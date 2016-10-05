@@ -51,7 +51,6 @@ define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model)
             render(routeMatch[1]);
         },
         saveHandler: function(routeMatch) {
-            console.log(routeMatch[1]);
             var dots = [];
             $('.dots .dot').each(function(index, jq) {
                 var $jq = $(jq), 
@@ -76,7 +75,24 @@ define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model)
             document.location.hash = '#/view/' + routeMatch[1];
         },
         addHandler: function(routeMatch) {
-
+            $('#add-modal').modal('show');
+            $('.add-content').first().focus();
+            $('#save-new-dot').attr('data-tid', routeMatch[1]);
+        },
+        addClickHandler: function(dotid) {
+            var olddot = model.timeline(dotid),
+                dot = {
+                    id: ((olddot.length + 1) * 1000).toString(),
+                    content: $('.add-content').first().text(),
+                    start: $('.add-start').first().text()
+                };
+            if ($('.add-end').first().text().length > 0) {
+                dot.end = $('.add-end').first().text();
+            }
+            else {
+                dot.type = 'point';
+            }
+            model.timeline(dotid).add(dot);
         },
         deleteHandler: function(routeMatch) {
             $('#delete-modal').modal('show');

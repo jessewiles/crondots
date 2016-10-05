@@ -12,7 +12,7 @@
         <h2> Crondots: Linear time modeling </h2>
         <div id="content"> </div>
 
-        <div class="modal fade" id="add-modal" role="dialog">
+        <div class="modal fade" id="new-modal" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -25,6 +25,37 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         <button id="save-new-timeline" type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="add-modal" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <h4 class="modal-title" id="new-timeline-title">Add timeline event</h4>
+                    </div>
+                    <div class="modal-content">
+                        <div id="add-dot-dialog">
+                            <div>
+                                <b>Content:</b>
+                            </div>
+                            <div class="add-content ctrl" contenteditable></div>
+                            <div>
+                                <b>Start:</b>
+                            </div>
+                            <div class="add-start ctrl" contenteditable></div>
+                            <div>
+                                <b>End:</b>
+                            </div>
+                            <div class="add-end ctrl" contenteditable></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button id="save-new-dot" type="button" class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
@@ -52,7 +83,7 @@
 
         <script id="t-home" type="text/x-handlebars-template">
           <div>
-            <button id="add-button" type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#add-modal">Add</button>
+            <button id="new-button" type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#new-modal">New</button>
           </div>
           <p> Welcome to crondots.  This site is dedicated to the creation of timelines from various sources.</p>
           <ul>

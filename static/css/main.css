@@ -31,7 +31,11 @@ body {
     margin: 1em;
     padding: 0.5em;
 }
-#add-button {
+#new-button {
     float: right;
     margin-right: 30%;
+}
+.ctrl {
+    padding: 0.5em;
+    border: 1px dotted #ccc;
 }

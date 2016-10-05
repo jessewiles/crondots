@@ -10,13 +10,13 @@ require(['jquery', 'bootstrap', 'app/router', 'app/handlers', 'app/model', 'app/
         });
 
     $(document).ready(function() {
-        $('#add-modal').on('shown.bs.modal', function(e) {
+        $('#new-modal').on('shown.bs.modal', function(e) {
             $('#new-timeline-name').focus();
         });
         $('#save-new-timeline').on('click', function(e) {
             var $name = $('#new-timeline-name');
             model.timelines($name.text());
-            $('#add-modal').modal('hide');
+            $('#new-modal').modal('hide');
             $name.text('');
             utils.gohome();
         });
@@ -24,6 +24,12 @@ require(['jquery', 'bootstrap', 'app/router', 'app/handlers', 'app/model', 'app/
             model.timeline($(e.target).data('tid')).delete();
             $('#delete-modal').modal('hide');
             utils.gohome();
+        });
+        $('#save-new-dot').click(function(e) {
+            var tid = $(e.target).data('tid');
+            handlers.addClickHandler(tid);
+            $('#add-modal').modal('hide');
+            utils.goedit('#/edit/' +tid);
         });
         window.onhashchange = function(e) {
             router.route(window.location.hash);

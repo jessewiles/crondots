@@ -41,6 +41,12 @@ define(function() {
                     localStorage.setItem('timelines', JSON.stringify(newTimelines));
                 }
             };
+            result.add = function(dot) {
+                if (dot !== undefined) {
+                    result.push(dot);
+                    localStorage.setItem(name, JSON.stringify(result));
+                }
+            };
             return result;
         }
     }
