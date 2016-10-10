@@ -12,7 +12,9 @@ requirejs.config({
         jquery: 'jquery-3.1.1',
         handlebars: 'handlebars.amd',
         vis: 'vis.min',
+        moment: 'moment',
         bootstrap: '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
+        dtpicker: 'bootstrap-datetimepicker.min',
         app: '../app'
     }
 });

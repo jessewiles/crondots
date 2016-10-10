@@ -1,4 +1,5 @@
-define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model) {
+define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
+       function($, vis, bs, dtpicker, Hb, model) {
     var hb_templates = function() {
             result = {};
             $("script[type = 'text/x-handlebars-template']").each(function(index, jq) {
@@ -41,13 +42,44 @@ define(['jquery', 'vis', 'handlebars', 'app/model'], function($, vis, Hb, model)
             render(routeMatch[1]);
         },
         editHandler: function(routeMatch) {
+            var dots = model.timeline(routeMatch[1]);
             $('#content').html(
                 hb_templates['t-edit']({
                     title: routeMatch[1],
                     id: routeMatch[1],
-                    dots: model.timeline(routeMatch[1])
+                    dots: dots
                 })
             );
+            for (var i = 0; i < dots.length; i++) {
+                var dot = dots[i],
+                    ctrlList = ['start', 'end'];
+                for (var j = 0; j < ctrlList.length; j++) {
+                    var ctrl = ctrlList[j];
+                    $('#' +ctrl+ '-dtpicker-date-' +dot.id).datetimepicker({
+                        viewMode: 'years',
+                        format: 'YYYY-MM-DD',
+                        ignoreReadonly: true
+                    });
+                    $('#' +ctrl+ '-dtpicker-time-' +dot.id).datetimepicker({
+                        format: 'hh:mm A',
+                        ignoreReadonly: true
+
+                    });
+                    $('input[name=' +ctrl+ '-specify-time-ctrl-' +dot.id+ ']').click(function(e) {
+                        var $target = $(e.target),
+                            prefix = $target.attr('name').split('-')[0],
+                            tidSuffix = $target.attr('name').replace(prefix+'-specify-time-ctrl-', '');
+                        if ($target.prop('checked')) {
+                           $('#' +prefix+ '-time-ctrl-' +tidSuffix).removeClass('hidden'); 
+                        }
+                        else {
+                            $('#' +prefix+ '-time-ctrl-' +tidSuffix).addClass('hidden');
+                            $('#' +prefix+ '-time-ctrl-' +tidSuffix+ ' input').first().val('');
+                        }
+                    });
+                }
+            }
+            
             render(routeMatch[1]);
         },
         saveHandler: function(routeMatch) {

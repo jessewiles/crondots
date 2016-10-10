@@ -1,0 +1,79 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title> Fulsome </title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css" />
+        <link rel="stylesheet" href="/static/css/font-awesome.min.css" />
+		<script type="text/javascript" src="/static/lib/jquery-3.1.1.js"></script>
+		<script type="text/javascript" src="/static/lib/moment.js"></script>
+		<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="/static/lib/bootstrap-datetimepicker.min.js"></script>
+<style>
+.inb {
+    display: inline-block;
+    max-width: 148px;
+    margin-left: 0.3em;
+}
+
+input[readonly] {
+    background-color: white;
+}
+</style>
+    </head>
+    <body>
+        <h2> Fulsome </h2>
+
+       <div class="container">
+            <div id="specify-time-group">
+                <label for="specify-time-ctrl">Specify time</label>
+                <input type="checkbox" name="specify-time-ctrl" />
+            </div>
+
+			<div class="col-md-6" style="height:130px;">
+				<div class="inb">
+					<div class='input-group date' id='datetimepicker8'>
+						<input type='text' class="form-control" readonly/>
+						<span class="input-group-addon">
+							<span class="glyphicon glyphicon-calendar">
+							</span>
+						</span>
+					</div>
+				</div>
+
+				<div class="inb hidden" id="time-ctrl">
+					<div class='input-group time' id='datetimepicker9'>
+						<input type='text' class="form-control" readonly/>
+						<span class="input-group-addon">
+							<span class="glyphicon glyphicon-time">
+							</span>
+						</span>
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+				$(function () {
+					$('#datetimepicker8').datetimepicker({
+						viewMode: 'years',
+                        format: 'YYYY-MM-DD',
+                        ignoreReadonly: true
+					});
+					$('#datetimepicker9').datetimepicker({
+                        format: 'hh:mm A',
+                        ignoreReadonly: true
+
+					});
+                    $('*[name=specify-time-ctrl]').click(function(e) {
+                        if ($(e.target).prop('checked')) {
+                           $('#time-ctrl').removeClass('hidden'); 
+                        }
+                        else {
+                            $('#time-ctrl').addClass('hidden');
+                            $('#time-ctrl input').first().val('');
+                        }
+                    });
+				});
+			</script>
+		</div>
+    </body>
+</html>
