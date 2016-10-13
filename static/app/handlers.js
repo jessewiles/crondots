@@ -22,6 +22,23 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 new vis.DataSet(dots),
                 {}
             );
+        },
+        convertTime = function(time) {
+            if (time.indexOf(' AM') > -1) {
+                var tparts = time.split(':');
+                    if (tparts[0] === '12') {
+                        tparts[0] = '00';
+                    }
+                return tparts[0] +':'+ tparts[1].replace(' AM', '');
+            }
+            else if (time.indexOf(' PM') > -1) {
+                var tparts = time.split(':'),
+                    hour = parseInt(tparts[0]),
+                    newhour = 12 + hour,
+                    newhour = (newhour < 24) ? newhour : 12;
+                return newhour.toString() +':'+ tparts[1].replace(' PM', '');
+            }
+            return time.replace(' AM', '').replace(' PM', '');
         };
 
     return {
@@ -43,6 +60,17 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
         },
         editHandler: function(routeMatch) {
             var dots = model.timeline(routeMatch[1]);
+            for (var i = 0; i < dots.length; i++) {
+                var dot = dots[i],
+                    startParts = dot.start.split(' '),
+                    endParts = (dot.end !== undefined) ? dot.end.split(' ') : null;
+                    dot.startDate = startParts[0];
+                    dot.startTime = (startParts.length > 1) ? startParts[1] : null;
+                    if (endParts) {
+                        dot.endDate = endParts[0];
+                        dot.endTime = (endParts.length > 1) ? endParts[1] : null;
+                    }
+            }
             $('#content').html(
                 hb_templates['t-edit']({
                     title: routeMatch[1],
@@ -79,7 +107,7 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                     });
                 }
             }
-            
+
             render(routeMatch[1]);
         },
         saveHandler: function(routeMatch) {
@@ -87,17 +115,23 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
             $('.dots .dot').each(function(index, jq) {
                 var $jq = $(jq), 
                     $content = $jq.find('.content').first(),
-                    $start = $jq.find('.start').first(),
-                    $end = $jq.find('.end').first(),
+                    $startDate = $jq.find('.start .date input').first(),
+                    $startTime = $jq.find('.start .time input').first(),
+                    $endDate = $jq.find('.end .date input').first(),
+                    $endTime = $jq.find('.end .time input').first(),
                     dot = {
                         id: $jq.attr('id').split('-')[1]
                     };
                 if ($content.text().length > 0) 
                     dot.content = $content.text();
-                if ($start.text().length > 0) 
-                    dot.start = $start.text();
-                if ($end.text().length > 0) 
-                    dot.end = $end.text();
+                if ($startDate.val().length > 0) 
+                    dot.start = $startDate.val();
+                if ($startTime.val().length > 0) 
+                    dot.start += ' ' +convertTime($startTime.val());
+                if ($endDate.val().length > 0)
+                    dot.end = $endDate.val();
+                    if ($endTime.val().length > 0)
+                        dot.end += ' ' +convertTime($endTime.val());
                 else 
                     dot.type = 'point';
                 if ($jq.attr('id').indexOf('add') === -1) 

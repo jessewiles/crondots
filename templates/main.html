@@ -121,18 +121,18 @@
             <div id="dotid-{{id}}" class="dot">
               <div><b>Content:</b></div>
               <div class="content ctrl" contenteditable>{{content}}</div>
-              <!-- boo -->
+              <!-- start -->
               <div><b>Start:</b></div>
               <div class="dtpicker start">
                 <div class="specify-time-group">
-                    <input type="checkbox" name="start-specify-time-ctrl-{{id}}" />
+                    <input type="checkbox" name="start-specify-time-ctrl-{{id}}" {{#if startTime}}checked{{/if}}/>
                     <label for="start-specify-time-ctrl-{{id}}">Specify time</label>
                 </div>
 
                 <div>
                     <div class="inb">
                         <div class="input-group date" id="start-dtpicker-date-{{id}}">
-                            <input type="text" class="form-control" value="{{start}}" readonly/>
+                            <input type="text" class="form-control" value="{{startDate}}" readonly/>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar">
                                 </span>
@@ -140,9 +140,9 @@
                         </div>
                     </div>
 
-                    <div class="inb hidden" id="start-time-ctrl-{{id}}">
+                    <div class="inb {{#if startTime}}{{else}}hidden{{/if}}" id="start-time-ctrl-{{id}}">
                         <div class="input-group time" id="start-dtpicker-time-{{id}}">
-                            <input type="text" class="form-control" readonly/>
+                            <input type="text" class="form-control" value="{{startTime}}" readonly/>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-time">
                                 </span>
@@ -155,15 +155,15 @@
               <div><b>End:</b></div>
               <div class="dtpicker end">
                 <div class="specify-time-group">
-                    <input type="checkbox" name="end-specify-time-ctrl-{{id}}" />
+                    <input type="checkbox" name="end-specify-time-ctrl-{{id}}" {{#if endTime}}checked{{/if}}/>
                     <label for="end-specify-time-ctrl-{{id}}">Specify time</label>
                 </div>
 
                 <div>
                     <div class="inb">
                         <div class="input-group date" id="end-dtpicker-date-{{id}}">
-                            {{#if end}}
-                            <input type="text" class="form-control" value="{{end}}" readonly/>
+                            {{#if endDate}}
+                            <input type="text" class="form-control" value="{{endDate}}" readonly/>
                             {{else}}
                             <input type="text" class="form-control" readonly/>
                             {{/if}}
@@ -174,9 +174,9 @@
                         </div>
                     </div>
 
-                    <div class="inb hidden" id="end-time-ctrl-{{id}}">
+                    <div class="inb {{#if endTime}}{{else}}hidden{{/if}}" id="end-time-ctrl-{{id}}">
                         <div class="input-group time" id="end-dtpicker-time-{{id}}">
-                            <input type="text" class="form-control" readonly/>
+                            <input type="text" class="form-control" value="{{endTime}}" readonly/>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-time">
                                 </span>
@@ -187,7 +187,7 @@
               </div>
             </div>
             {{/each}}
-            <div class="dot" id="dotid-add">
+            <div id="dotid-add">
               <div><b><a href="#/add/{{id}}">Add</a></b></div>
             </div>
           </div>
@@ -200,27 +200,27 @@
                 <input type="checkbox" name="specify-time-ctrl" />
             </div>
 
-			<div class="col-md-6" style="height:130px;">
-				<div class="inb">
+            <div class="col-md-6" style="height:130px;">
+                <div class="inb">
                     <div class="input-group date" id="datetimepicker{{idnum}}">
-						<input type="text" class="form-control" readonly/>
-						<span class="input-group-addon">
-							<span class="glyphicon glyphicon-calendar">
-							</span>
-						</span>
-					</div>
-				</div>
+                        <input type="text" class="form-control" readonly/>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar">
+                            </span>
+                        </span>
+                    </div>
+                </div>
 
-				<div class="inb hidden" id="time-ctrl">
-					<div class="input-group time" id="datetimepicker9">
-						<input type="text" class="form-control" readonly/>
-						<span class="input-group-addon">
-							<span class="glyphicon glyphicon-time">
-							</span>
-						</span>
-					</div>
-				</div>
-			</div>
+                <div class="inb hidden" id="time-ctrl">
+                    <div class="input-group time" id="datetimepicker9">
+                        <input type="text" class="form-control" readonly/>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time">
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
           </div>
         </script>
     </body>
