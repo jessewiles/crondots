@@ -98,11 +98,24 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                             prefix = $target.attr('name').split('-')[0],
                             tidSuffix = $target.attr('name').replace(prefix+'-specify-time-ctrl-', '');
                         if ($target.prop('checked')) {
-                           $('#' +prefix+ '-time-ctrl-' +tidSuffix).removeClass('hidden'); 
+                           $('#' +prefix+ '-time-ctrl-' +tidSuffix).removeClass('hidden');
                         }
                         else {
                             $('#' +prefix+ '-time-ctrl-' +tidSuffix).addClass('hidden');
                             $('#' +prefix+ '-time-ctrl-' +tidSuffix+ ' input').first().val('');
+                        }
+                    });
+                    $('input[name=' +ctrl+ '-specify-end-ctrl-' +dot.id+ ']').click(function(e) {
+                        var $target = $(e.target),
+                            $dot = $($target.parent().parent()),
+                            prefix = $target.attr('name').split('-')[0],
+                            tidSuffix = $target.attr('name').replace(prefix+ '-specify-end-ctrl-', '');
+                        if ($target.prop('checked')) {
+                            $dot.find('.dtpicker.end').first().removeClass('hidden');
+                        }
+                        else {
+                            $dot.find('.dtpicker.end').first().addClass('hidden');
+                            $dot.find('.end input').val('');
                         }
                     });
                 }

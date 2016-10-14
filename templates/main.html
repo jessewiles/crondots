@@ -152,8 +152,11 @@
                 </div>
               </div>
 
-              <div><b>End:</b></div>
-              <div class="dtpicker end">
+              <div>
+                <input type="checkbox" name="end-specify-end-ctrl-{{id}}" {{#if endDate}}checked{{/if}}/>
+                <b>End:</b>
+              </div>
+              <div class="dtpicker end {{#unless endDate}}hidden{{/unless}}">
                 <div class="specify-time-group">
                     <input type="checkbox" name="end-specify-time-ctrl-{{id}}" {{#if endTime}}checked{{/if}}/>
                     <label for="end-specify-time-ctrl-{{id}}">Specify time</label>
