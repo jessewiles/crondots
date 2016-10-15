@@ -176,8 +176,10 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 if ($jq.attr('id').indexOf('add') === -1) 
                     dots.push(dot);
             });
-            if (timelineName != routeMatch[1])
+            if (timelineName != routeMatch[1]) {
                 model.timeline(routeMatch[1]).delete();
+                model.timelines(timelineName);
+            }
             model.timeline(timelineName, dots);
             document.location.hash = '#/view/' + timelineName;
         },
