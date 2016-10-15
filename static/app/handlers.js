@@ -39,6 +39,30 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 return newhour.toString() +':'+ tparts[1].replace(' PM', '');
             }
             return time.replace(' AM', '').replace(' PM', '');
+        },
+        textSelect = function(ev) {
+            ev = ev || winddow.event;
+            var $e = $(this),
+                t = $e.text(),
+                hl = function() {
+                    var range, c, selection;
+
+                    ev.stopPropagation();
+
+                    $e.removeClass('wltext');
+                    $e.addClass('wtext');
+
+                    range = window.document.createRange();
+                    c = $e.get(0).firstChild;
+
+                    range.setStart(c, 0);
+                    range.setEnd(c, c.data.length);
+
+                    selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                };
+            setTimeout(hl, 10, $e);
         };
 
     return {
@@ -78,6 +102,7 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                     dots: dots
                 })
             );
+            $('.ctrl').focus(textSelect);
             for (var i = 0; i < dots.length; i++) {
                 var dot = dots[i],
                     ctrlList = ['start', 'end'];
@@ -124,7 +149,8 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
             render(routeMatch[1]);
         },
         saveHandler: function(routeMatch) {
-            var dots = [];
+            var dots = [],
+                timelineName = $('.timeline-title span').first().text().trim();
             $('.dots .dot').each(function(index, jq) {
                 var $jq = $(jq), 
                     $content = $jq.find('.content').first(),
@@ -150,8 +176,10 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 if ($jq.attr('id').indexOf('add') === -1) 
                     dots.push(dot);
             });
-            model.timeline(routeMatch[1], dots);
-            document.location.hash = '#/view/' + routeMatch[1];
+            if (timelineName != routeMatch[1])
+                model.timeline(routeMatch[1]).delete();
+            model.timeline(timelineName, dots);
+            document.location.hash = '#/view/' + timelineName;
         },
         addHandler: function(routeMatch) {
             $('#add-modal').modal('show');
