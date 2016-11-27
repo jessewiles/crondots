@@ -39,19 +39,71 @@
                         <h4 class="modal-title" id="new-timeline-title">Add timeline event</h4>
                     </div>
                     <div class="modal-content">
-                        <div id="add-dot-dialog">
-                            <div>
-                                <b>Content:</b>
+                        <div id="dotid-adder" class="widedot">
+                        <div><b>Content:</b></div>
+                        <div class="add-content ctrl" contenteditable></div>
+                        <!-- start -->
+                        <div><b>Start:</b></div>
+                        <div class="dtpicker start">
+                            <div class="specify-time-group">
+                                <input type="checkbox" name="start-specify-time-ctrl-adder" />
+                                <label for="start-specify-time-ctrl-adder">Specify time</label>
                             </div>
-                            <div class="add-content ctrl" contenteditable></div>
+
                             <div>
-                                <b>Start:</b>
+                                <div class="inb">
+                                    <div class="input-group date" id="start-dtpicker-date-adder">
+                                        <input type="text" class="add-start form-control" readonly/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar">
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="inb" id="start-time-ctrl-adder">
+                                    <div class="input-group time" id="start-dtpicker-time-adder">
+                                        <input type="text" class="form-control" readonly/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-time">
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="add-start ctrl" contenteditable></div>
+                        </div>
+
+                        <div>
+                            <input type="checkbox" name="end-specify-end-ctrl-adder" />
+                            <b>End:</b>
+                        </div>
+                        <div class="dtpicker end hidden">
+                            <div class="specify-time-group">
+                                <input type="checkbox" name="end-specify-time-ctrl-adder" />
+                                <label for="end-specify-time-ctrl-adder">Specify time</label>
+                            </div>
+
                             <div>
-                                <b>End:</b>
+                                <div class="inb">
+                                    <div class="input-group date" id="end-dtpicker-date-adder">
+                                        <input type="text" class="add-end form-control" readonly/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar">
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="inb hidden" id="end-time-ctrl-adder">
+                                    <div class="input-group time" id="end-dtpicker-time-adder">
+                                        <input type="text" class="form-control" readonly/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-time">
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="add-end ctrl" contenteditable></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -119,6 +171,7 @@
           <div class="dots">
             {{#each dots}}
             <div id="dotid-{{id}}" class="dot">
+	      <div class="closer">X</div>
               <div><b>Content:</b></div>
               <div class="content ctrl" contenteditable>{{content}}</div>
               <!-- start -->

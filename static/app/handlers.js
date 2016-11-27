@@ -41,7 +41,7 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
             return time.replace(' AM', '').replace(' PM', '');
         },
         textSelect = function(ev) {
-            ev = ev || winddow.event;
+            ev = ev || window.event;
             var $e = $(this),
                 t = $e.text(),
                 hl = function() {
@@ -63,6 +63,11 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                     selection.addRange(range);
                 };
             setTimeout(hl, 10, $e);
+        },
+        deleteDotHandler = function(ev) {
+            ev = ev || window.event;
+            var $e = $(this);
+            $e.parent().remove();
         };
 
     return {
@@ -103,6 +108,7 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 })
             );
             $('.ctrl').focus(textSelect);
+            $('.closer').click(deleteDotHandler);
             for (var i = 0; i < dots.length; i++) {
                 var dot = dots[i],
                     ctrlList = ['start', 'end'];
@@ -185,6 +191,48 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
         },
         addHandler: function(routeMatch) {
             $('#add-modal').modal('show');
+            var ctrlList = ['start', 'end'];
+            for (var j = 0; j < ctrlList.length; j++) {
+                // ************************
+                // TODO: Finish this shit
+                // ************************
+                var ctrl = ctrlList[j];
+                $('#' +ctrl+ '-dtpicker-date-adder').datetimepicker({
+                    viewMode: 'years',
+                    format: 'YYYY-MM-DD',
+                    ignoreReadonly: true
+                });
+                $('#' +ctrl+ '-dtpicker-time-adder').datetimepicker({
+                    format: 'hh:mm A',
+                    ignoreReadonly: true
+
+                });
+                $('input[name=' +ctrl+ '-specify-time-ctrl-adder]').click(function(e) {
+                    var $target = $(e.target),
+                        prefix = $target.attr('name').split('-')[0],
+                        tidSuffix = $target.attr('name').replace(prefix+'-specify-time-ctrl-', '');
+                    if ($target.prop('checked')) {
+                        $('#' +prefix+ '-time-ctrl-' +tidSuffix).removeClass('hidden');
+                    }
+                    else {
+                        $('#' +prefix+ '-time-ctrl-' +tidSuffix).addClass('hidden');
+                        $('#' +prefix+ '-time-ctrl-' +tidSuffix+ ' input').first().val('');
+                    }
+                });
+                $('input[name=' +ctrl+ '-specify-end-ctrl-adder]').click(function(e) {
+                    var $target = $(e.target),
+                        $dot = $($target.parent().parent()),
+                        prefix = $target.attr('name').split('-')[0],
+                        tidSuffix = $target.attr('name').replace(prefix+ '-specify-end-ctrl-', '');
+                    if ($target.prop('checked')) {
+                        $dot.find('.dtpicker.end').first().removeClass('hidden');
+                    }
+                    else {
+                        $dot.find('.dtpicker.end').first().addClass('hidden');
+                        $dot.find('.end input').val('');
+                    }
+                });
+            }
             $('.add-content').first().focus();
             $('#save-new-dot').attr('data-tid', routeMatch[1]);
         },
@@ -193,10 +241,10 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 dot = {
                     id: ((olddot.length + 1) * 1000).toString(),
                     content: $('.add-content').first().text(),
-                    start: $('.add-start').first().text()
+                    start: $('.add-start').first().val()
                 };
             if ($('.add-end').first().text().length > 0) {
-                dot.end = $('.add-end').first().text();
+                dot.end = $('.add-end').first().val();
             }
             else {
                 dot.type = 'point';

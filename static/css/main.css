@@ -24,6 +24,12 @@ body {
     width: 250px;
     max-width: 250px;
 }
+.widedot {
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid lightblue;
+    border-radius: 10px;
+}
 .content, .start, .end {
     margin: 1em;
 }
@@ -47,4 +53,9 @@ body {
 
 .vis-item .vis-item-overflow {
   overflow: visible;
+}
+.closer {
+    float: right;
+    margin: 0.5em;
+    cursor: pointer;
 }
