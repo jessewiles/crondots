@@ -169,9 +169,12 @@
           </div>
           <div class="timeline"></div>
           <div class="dots">
+            <div id="dotid-add">
+              <div><b><a href="#/add/{{id}}">Add</a></b></div>
+            </div>
             {{#each dots}}
             <div id="dotid-{{id}}" class="dot">
-	      <div class="closer">X</div>
+              <div class="closer">X</div>
               <div><b>Content:</b></div>
               <div class="content ctrl" contenteditable>{{content}}</div>
               <!-- start -->
@@ -243,9 +246,6 @@
               </div>
             </div>
             {{/each}}
-            <div id="dotid-add">
-              <div><b><a href="#/add/{{id}}">Add</a></b></div>
-            </div>
           </div>
         </script>
 

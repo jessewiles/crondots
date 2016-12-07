@@ -30,6 +30,21 @@ define(function() {
             catch(e) {
                 return result;
             }
+	    result.getNewId = function() {
+                var possible = (result.length + 1) * 1000,
+                    ids = {};
+                for (var i = 0; i < result.length; i++) {
+                    ids[result[i].id] = true;
+                }
+                function verify() {
+                    if (ids[possible] !== undefined) {
+                        possible = possible + 9;
+                        verify();
+                    }
+                }
+                verify();
+                return 'x'+possible.toString();
+	    };
             result.delete = function() {
                 if (name !== undefined) {
                     var newTimelines = [];

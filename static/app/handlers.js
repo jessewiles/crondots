@@ -239,7 +239,7 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
         addClickHandler: function(dotid) {
             var olddot = model.timeline(dotid),
                 dot = {
-                    id: ((olddot.length + 1) * 1000).toString(),
+                    id: olddot.getNewId(),
                     content: $('.add-content').first().text(),
                     start: $('.add-start').first().val()
                 };
@@ -249,6 +249,8 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
             else {
                 dot.type = 'point';
             }
+            $('.add-content').first().text('');
+            $('.add-start').first().val('');
             model.timeline(dotid).add(dot);
         },
         deleteHandler: function(routeMatch) {
