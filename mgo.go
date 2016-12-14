@@ -2,17 +2,19 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 )
 
+// Person - blah blah blah
 type Person struct {
 	Name  string
 	Phone string
 }
 
-func main() {
+func mgomain() {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
 		panic(err)
