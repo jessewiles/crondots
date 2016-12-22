@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/context"
 
+	"golang.org/x/crypto/bcrypt"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -45,6 +48,12 @@ type FrontPage struct {
 	Nada string
 }
 
+// UserRegistration - blah blah blah
+type UserRegistration struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.New("main.html").Delims("[[", "]]").ParseFiles("templates/main.html")
 	if err != nil {
@@ -65,6 +74,42 @@ func handleThing(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var ur UserRegistration
+	err = json.Unmarshal(body, &ur)
+	if err != nil {
+		log.Print("Error unmarshaling.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// check if email exists
+	db := context.Get(r, "db").(*mgo.Session)
+	var existing UserRegistration
+
+	err = db.DB("cdots").C("users").Find(bson.M{"email": ur.Email}).One(&existing)
+	if err == nil {
+		log.Print("Error when fetching existing.")
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(ur.Password), bcrypt.DefaultCost)
+	ur.Password = string(hashedPassword)
+	err = db.DB("cdots").C("users").Insert(&ur)
+	if err != nil {
+		log.Print("Error inserting user.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	srv, err := NewServer()
 	if err != nil {
@@ -76,5 +121,6 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 	http.HandleFunc("/", siteIndexHandler)
 	http.HandleFunc("/things", srv.WithData(handleThing))
+	http.HandleFunc("/register", srv.WithData(registerHandler))
 	http.ListenAndServe(":8080", nil)
 }

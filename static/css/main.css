@@ -59,3 +59,12 @@ body {
     margin: 0.5em;
     cursor: pointer;
 }
+.warning {
+    color: red;
+}
+.widget-pair {
+    margin-top: 0.4em;
+}
+.widget-pair label, .widget-pair input {
+    display: block;
+}

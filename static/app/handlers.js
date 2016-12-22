@@ -87,6 +87,35 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
             );
             render(routeMatch[1]);
         },
+        registerHandler: function(routeMatch) {
+            $('#content').html(
+                hb_templates['register-template']({})
+            );
+            $('#submit-registration').on('click', function(e) {
+                $.ajax({
+                    url: '/register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: $('#user-email').val(),
+                        password: $('#user-password').val()
+                    }),
+                    error: function(request) {
+                        if (request.status === 409) {
+                            $('#user-email').val('').focus();
+                            $('#user-password').val('');
+                            $('#confirm-password').val('');
+                            $('#content').find('.warning')
+                                         .first()
+                                         .text('User with this email already exists.')
+                        }
+                    },
+                    success: function(result) {
+                        document.location.hash = '#/home';
+                    }
+                })
+            });
+        },
         editHandler: function(routeMatch) {
             var dots = model.timeline(routeMatch[1]);
             for (var i = 0; i < dots.length; i++) {

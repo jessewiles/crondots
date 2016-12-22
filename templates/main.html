@@ -139,6 +139,7 @@
             <button id="new-button" type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#new-modal">New</button>
           </div>
           <p> Welcome to crondots.  This site is dedicated to the creation of timelines from various sources.</p>
+          <p> <a href="#/register">Register</a></p>
           <ul>
               {{#each timelines}}
               <li><a href="#/view/{{this}}">{{this}}</a></li>
@@ -154,6 +155,28 @@
               <a href="#/edit/{{id}}">Edit</a>
           </div>
           <div class="timeline"></div>
+        </script>
+
+        <script id="register-template" type="text/x-handlebars-template">
+          <h4 class="title">Register</h4>
+          <div class="container">
+            <div class="warning"></div>
+            <div class="widget-pair">
+              <label for="user-email">User Email</label>
+              <input type="text" name="user-email" id="user-email" />
+            </div>
+            <div class="widget-pair">
+              <label for="user-password">User Password</label>
+              <input type="password" name="user-password" id="user-password" />
+            </div>
+            <div class="widget-pair">
+              <label for="confirm-password"> Confirm Password</label>
+              <input type="password" name="confirm-password" id="confirm-password" />
+            </div>
+            <div class="widget-pair">
+              <input type="button" name="Submit" value="Submit" id="submit-registration" />
+            </div>
+          </div>
         </script>
 
         <script id="t-edit" type="text/x-handlebars-template">
@@ -279,5 +302,6 @@
             </div>
           </div>
         </script>
+
     </body>
 </html>

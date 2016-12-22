@@ -6,7 +6,8 @@ require(['jquery', 'bootstrap', 'app/router', 'app/handlers', 'app/model', 'app/
             '#/edit/(.*)': handlers.editHandler,
             '#/save/(.*)': handlers.saveHandler,
             '#/add/(.*)': handlers.addHandler,
-            '#/delete/(.*)': handlers.deleteHandler
+            '#/delete/(.*)': handlers.deleteHandler,
+            '#/register': handlers.registerHandler
         });
 
     $(document).ready(function() {
