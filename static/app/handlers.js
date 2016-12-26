@@ -116,6 +116,29 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                 })
             });
         },
+        signinHandler: function(routeMatch) {
+            $('#content').html(
+                hb_templates['signin-template']({})
+            );
+            $('#submit-signin').on('click', function(e) {
+                $.ajax({
+                    url: '/signin',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: $('#user-email').val(),
+                        password: $('#user-password').val()
+                    }),
+                    success: function(result) {
+                        document.location.hash = '#/home';
+                    },
+                    error: function(request) {
+                        $('#content').find('.warning').first().text('Invalid username/password combination.')
+                        $('#user-password').val('').focus();
+                    }
+                });
+            });
+        },
         editHandler: function(routeMatch) {
             var dots = model.timeline(routeMatch[1]);
             for (var i = 0; i < dots.length; i++) {

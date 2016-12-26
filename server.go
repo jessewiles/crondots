@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/context"
+	uuid "github.com/satori/go.uuid"
 
 	"golang.org/x/crypto/bcrypt"
 	mgo "gopkg.in/mgo.v2"
@@ -48,10 +49,18 @@ type FrontPage struct {
 	Nada string
 }
 
-// UserRegistration - blah blah blah
-type UserRegistration struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+// User - blah blah blah
+type User struct {
+	ID       bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Email    string        `json:"email"`
+	Password string        `json:"password"`
+}
+
+// Session - blah blah blah
+type Session struct {
+	ID      bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Session string        `json:"session"`
+	Email   string        `json:"email"`
 }
 
 func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,14 +83,48 @@ func handleThing(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func sessionHandler(w http.ResponseWriter, r *http.Request) {
+	var session Session
+	var active User
+
+	db := context.Get(r, "db").(*mgo.Session)
+
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		active = User{Email: "anonymous@anonymous"}
+	} else {
+		err = db.DB("cdots").C("session").Find(bson.M{"session": cookie.String()}).One(&session)
+		if err != nil {
+			log.Print("Problem reading session.")
+			return
+		}
+		err = db.DB("cdots").C("users").Find(bson.M{"email": session.Email}).One(&active)
+		if err != nil {
+			log.Print("Problem reading session.")
+			return
+		}
+	}
+
+	payload, err := json.Marshal(&active)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", string(len(payload)))
+	w.Write(payload)
+}
+
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	var ur UserRegistration
-	err = json.Unmarshal(body, &ur)
+	var user User
+	err = json.Unmarshal(body, &user)
 	if err != nil {
 		log.Print("Error unmarshaling.")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -90,23 +133,66 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// check if email exists
 	db := context.Get(r, "db").(*mgo.Session)
-	var existing UserRegistration
+	var existing User
 
-	err = db.DB("cdots").C("users").Find(bson.M{"email": ur.Email}).One(&existing)
+	err = db.DB("cdots").C("users").Find(bson.M{"email": user.Email}).One(&existing)
 	if err == nil {
 		log.Print("Error when fetching existing.")
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(ur.Password), bcrypt.DefaultCost)
-	ur.Password = string(hashedPassword)
-	err = db.DB("cdots").C("users").Insert(&ur)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	user.Password = string(hashedPassword)
+	err = db.DB("cdots").C("users").Insert(&user)
 	if err != nil {
 		log.Print("Error inserting user.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func signinHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var user User
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		log.Print("Error unmarshaling.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// check if email exists
+	db := context.Get(r, "db").(*mgo.Session)
+	var existing User
+
+	err = db.DB("cdots").C("users").Find(bson.M{"email": user.Email}).One(&existing)
+	if err != nil {
+		log.Print("Error when fetching existing.")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(existing.Password), []byte(user.Password))
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	// Generate, store and set session info
+	session := Session{Email: existing.Email, Session: uuid.NewV4().String()}
+	err = db.DB("cdots").C("session").Insert(&session)
+
+	cookie := http.Cookie{Name: "session", Value: session.Session}
+	http.SetCookie(w, &cookie)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -119,8 +205,10 @@ func main() {
 
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static", fs))
-	http.HandleFunc("/", siteIndexHandler)
+	http.HandleFunc("/", srv.WithData(siteIndexHandler))
+	http.HandleFunc("/session", srv.WithData(sessionHandler))
 	http.HandleFunc("/things", srv.WithData(handleThing))
 	http.HandleFunc("/register", srv.WithData(registerHandler))
+	http.HandleFunc("/signin", srv.WithData(signinHandler))
 	http.ListenAndServe(":8080", nil)
 }

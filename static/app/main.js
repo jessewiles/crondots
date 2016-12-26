@@ -7,7 +7,8 @@ require(['jquery', 'bootstrap', 'app/router', 'app/handlers', 'app/model', 'app/
             '#/save/(.*)': handlers.saveHandler,
             '#/add/(.*)': handlers.addHandler,
             '#/delete/(.*)': handlers.deleteHandler,
-            '#/register': handlers.registerHandler
+            '#/register': handlers.registerHandler,
+            '#/signin': handlers.signinHandler
         });
 
     $(document).ready(function() {

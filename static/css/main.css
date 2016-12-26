@@ -68,3 +68,6 @@ body {
 .widget-pair label, .widget-pair input {
     display: block;
 }
+.user-frame {
+    float: right;
+}
