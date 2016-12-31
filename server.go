@@ -6,14 +6,22 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	uuid "github.com/satori/go.uuid"
+
+	"encoding/gob"
 
 	"golang.org/x/crypto/bcrypt"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+var store = sessions.NewCookieStore([]byte("!pml$onk&ibj)uvh"))
 
 // Server - db server
 type Server struct {
@@ -46,7 +54,7 @@ func (s *Server) WithData(fn http.HandlerFunc) http.HandlerFunc {
 
 // FrontPage - blah blah blah
 type FrontPage struct {
-	Nada string
+	User User
 }
 
 // User - blah blah blah
@@ -56,60 +64,39 @@ type User struct {
 	Password string        `json:"password"`
 }
 
-// Session - blah blah blah
-type Session struct {
-	ID      bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Session string        `json:"session"`
-	Email   string        `json:"email"`
-}
-
-func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
+func writeMainPage(w http.ResponseWriter, r *http.Request, u User) {
 	t, err := template.New("main.html").Delims("[[", "]]").ParseFiles("templates/main.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	err = t.Execute(w, &FrontPage{Nada: "scoobie"})
+	err = t.Execute(w, &FrontPage{User: u})
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-func handleThing(w http.ResponseWriter, r *http.Request) {
-	db := context.Get(r, "db").(*mgo.Session)
-	err := db.DB("test").C("things").Insert(bson.M{"val": 1})
+func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
+	sessionCookie, err := r.Cookie("session")
 	if err != nil {
-		// handle error
+		log.Print("No session cookie.")
+		writeMainPage(w, r, User{})
+		return
 	}
-}
-
-func sessionHandler(w http.ResponseWriter, r *http.Request) {
-	var session Session
-	var active User
-
-	db := context.Get(r, "db").(*mgo.Session)
-
-	cookie, err := r.Cookie("session")
+	session, err := store.Get(r, sessionCookie.Value)
 	if err != nil {
-		active = User{Email: "anonymous@anonymous"}
-	} else {
-		err = db.DB("cdots").C("session").Find(bson.M{"session": cookie.String()}).One(&session)
-		if err != nil {
-			log.Print("Problem reading session.")
-			return
-		}
-		err = db.DB("cdots").C("users").Find(bson.M{"email": session.Email}).One(&active)
-		if err != nil {
-			log.Print("Problem reading session.")
-			return
-		}
+		log.Print("No session.")
+		writeMainPage(w, r, User{})
+		return
 	}
-
-	payload, err := json.Marshal(&active)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", string(len(payload)))
-	w.Write(payload)
+	val := session.Values["user"]
+	user, ok := val.(*User)
+	if user != nil && !ok {
+		log.Print("Problem decoding the session")
+		writeMainPage(w, r, User{})
+		return
+	}
+	writeMainPage(w, r, *user)
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
@@ -187,13 +174,36 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	// Generate, store and set session info
-	session := Session{Email: existing.Email, Session: uuid.NewV4().String()}
-	err = db.DB("cdots").C("session").Insert(&session)
 
-	cookie := http.Cookie{Name: "session", Value: session.Session}
+	// Generate, store and set session info
+	sessionID := uuid.NewV4().String()
+	cookie := http.Cookie{Name: "session", Value: sessionID}
+	session, err := store.Get(r, sessionID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	session.Values["user"] = existing
+	sessions.Save(r, w)
+
 	http.SetCookie(w, &cookie)
 	w.WriteHeader(http.StatusOK)
+	userJSON, _ := json.Marshal(existing)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", string(len(userJSON)))
+	w.Write(userJSON)
+}
+
+func uuidHandler(w http.ResponseWriter, r *http.Request) {
+	auuid := []byte(uuid.NewV4().String())
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Length", strconv.Itoa(len(auuid)))
+	w.Write(auuid)
+}
+
+func init() {
+	gob.Register(&User{})
 }
 
 func main() {
@@ -203,12 +213,18 @@ func main() {
 	}
 	defer srv.Close() // close the server later
 
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/", http.StripPrefix("/static", fs))
-	http.HandleFunc("/", srv.WithData(siteIndexHandler))
-	http.HandleFunc("/session", srv.WithData(sessionHandler))
-	http.HandleFunc("/things", srv.WithData(handleThing))
-	http.HandleFunc("/register", srv.WithData(registerHandler))
-	http.HandleFunc("/signin", srv.WithData(signinHandler))
-	http.ListenAndServe(":8080", nil)
+	r := mux.NewRouter()
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	r.HandleFunc("/", srv.WithData(siteIndexHandler))
+	r.HandleFunc("/auuid", uuidHandler)
+	r.HandleFunc("/register", srv.WithData(registerHandler))
+	r.HandleFunc("/signin", srv.WithData(signinHandler))
+	websrv := &http.Server{
+		Handler: r,
+		Addr:    ":8080",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	log.Fatal(websrv.ListenAndServe())
 }

@@ -1,4 +1,4 @@
-define(function() {
+define(['jquery'], function($) {
     return {
         timelines: function(name) {
             try {
@@ -30,21 +30,34 @@ define(function() {
             catch(e) {
                 return result;
             }
-	    result.getNewId = function() {
-                var possible = (result.length + 1) * 1000,
-                    ids = {};
-                for (var i = 0; i < result.length; i++) {
-                    ids[result[i].id] = true;
+            result.getNewId = function() {
+                if (true) {
+                    var iresult = null;
+                    $.ajax({
+                        url: '/auuid',
+                        async: false,
+                        success: function(result) {
+                            iresult = result;
+                        }
+                    });
+                    return iresult;
                 }
-                function verify() {
-                    if (ids[possible] !== undefined) {
-                        possible = possible + 9;
-                        verify();
+                else {
+                    var possible = (result.length + 1) * 1000,
+                        ids = {};
+                    for (var i = 0; i < result.length; i++) {
+                        ids[result[i].id] = true;
                     }
+                    function verify() {
+                        if (ids[possible] !== undefined) {
+                            possible = possible + 9;
+                            verify();
+                        }
+                    }
+                    verify();
+                    return 'x'+possible.toString();
                 }
-                verify();
-                return 'x'+possible.toString();
-	    };
+            };
             result.delete = function() {
                 if (name !== undefined) {
                     var newTimelines = [];

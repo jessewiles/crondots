@@ -1,5 +1,5 @@
-define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
-       function($, vis, bs, dtpicker, Hb, model) {
+define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model', 'app/session'],
+       function($, vis, bs, dtpicker, Hb, model, session) {
     var hb_templates = function() {
             result = {};
             $("script[type = 'text/x-handlebars-template']").each(function(index, jq) {
@@ -55,12 +55,15 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                     range = window.document.createRange();
                     c = $e.get(0).firstChild;
 
-                    range.setStart(c, 0);
-                    range.setEnd(c, c.data.length);
+                    try {
+                        range.setStart(c, 0);
+                        range.setEnd(c, c.data.length);
 
-                    selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                        selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                    catch(e) {}
                 };
             setTimeout(hl, 10, $e);
         },
@@ -72,8 +75,10 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
 
     return {
         homeHandler: function(routeMatch) {
+            if (window.email.indexOf('@') > -1) session.email(window.email);
             $('#content').html(
                 hb_templates['t-home']({
+                    email: session.email(),
                     timelines: model.timelines()
                 })
             );
@@ -130,6 +135,8 @@ define(['jquery', 'vis', 'bootstrap', 'dtpicker', 'handlebars', 'app/model'],
                         password: $('#user-password').val()
                     }),
                     success: function(result) {
+                        result = JSON.parse(result);
+                        session.email(result.email);
                         document.location.hash = '#/home';
                     },
                     error: function(request) {
