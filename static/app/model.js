@@ -1,36 +1,58 @@
 define(['jquery'], function($) {
     return {
         timelines: function(name) {
-            try {
-                var timelines = JSON.parse(localStorage.getItem('timelines')) || [];
-                if (name !== undefined) {
-                    timelines.push(name);
-                    localStorage.setItem('timelines', JSON.stringify(timelines));
-                    this.timeline(name, []);
-                }
-                else {
-                    return timelines;
-                }
+            if (true) {
+                $.ajax({
+                    url: '/timelines',
+                    success: function(result) {
+                        // do something
+                    }
+                })
             }
-            catch(e) {
-                return [];
+            else {
+                try {
+                    var timelines = JSON.parse(localStorage.getItem('timelines')) || [];
+                    if (name !== undefined) {
+                        timelines.push(name);
+                        localStorage.setItem('timelines', JSON.stringify(timelines));
+                        this.timeline(name, []);
+                    }
+                    else {
+                        return timelines;
+                    }
+                }
+                catch(e) {
+                    return [];
+                }
             }
         },
         timeline: function(name, value) {
-            if (name === undefined)
-                throw 'Must pass a name argument to this function';
-            var result = {},
-                oldTimelines = this.timelines();
-            if (value !== undefined) {
-                localStorage.setItem(name, JSON.stringify(value));
+            var iresult = {};
+            if (true) {
+                // TODO: get or set a timeline
+                $.ajax({
+                    url: '/timeline/' + name,
+                    async: false,
+                    success: function(result) {
+                        iresult = result;
+                    }
+                });
             }
-            try {
-                result = JSON.parse(localStorage.getItem(name));
+            else {
+                if (name === undefined)
+                    throw 'Must pass a name argument to this function';
+                var oldTimelines = this.timelines();
+                if (value !== undefined) {
+                    localStorage.setItem(name, JSON.stringify(value));
+                }
+                try {
+                    iresult = JSON.parse(localStorage.getItem(name));
+                }
+                catch(e) {
+                    return iresult;
+                }
             }
-            catch(e) {
-                return result;
-            }
-            result.getNewId = function() {
+            iresult.getNewId = function() {
                 if (true) {
                     var iresult = null;
                     $.ajax({
@@ -43,10 +65,10 @@ define(['jquery'], function($) {
                     return iresult;
                 }
                 else {
-                    var possible = (result.length + 1) * 1000,
+                    var possible = (iresult.length + 1) * 1000,
                         ids = {};
-                    for (var i = 0; i < result.length; i++) {
-                        ids[result[i].id] = true;
+                    for (var i = 0; i < iresult.length; i++) {
+                        ids[iresult[i].id] = true;
                     }
                     function verify() {
                         if (ids[possible] !== undefined) {
@@ -58,24 +80,48 @@ define(['jquery'], function($) {
                     return 'x'+possible.toString();
                 }
             };
-            result.delete = function() {
-                if (name !== undefined) {
-                    var newTimelines = [];
-                    localStorage.removeItem(name);
-                    for (var i = 0; i < oldTimelines.length; i++) {
-                        if (oldTimelines[i] !== name)
-                            newTimelines.push(oldTimelines[i]);
+            iresult.delete = function() {
+                if (true) {
+                    $.ajax({
+                        url: '/timeline/' + name,
+                        method: 'DELETE',
+                        async: false,
+                        success: function(result) {
+                            // pass
+                        }
+                    });
+                }
+                else {
+                    if (name !== undefined) {
+                        var newTimelines = [];
+                        localStorage.removeItem(name);
+                        for (var i = 0; i < oldTimelines.length; i++) {
+                            if (oldTimelines[i] !== name)
+                                newTimelines.push(oldTimelines[i]);
+                        }
+                        localStorage.setItem('timelines', JSON.stringify(newTimelines));
                     }
-                    localStorage.setItem('timelines', JSON.stringify(newTimelines));
                 }
             };
-            result.add = function(dot) {
-                if (dot !== undefined) {
-                    result.push(dot);
-                    localStorage.setItem(name, JSON.stringify(result));
+            iresult.add = function(dot) {
+                if (iresult !== undefined) {
+                    iresult.push(dot);
+                    if (true) {
+                        $.ajax({
+                            url: '/timeline/' +name,
+                            method: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify(iresult)
+                        });
+                    }
+                    else {
+                        if (dot !== undefined) {
+                            localStorage.setItem(name, JSON.stringify(iresult));
+                        }
+                    }
                 }
             };
-            return result;
+            return iresult;
         }
     }
 });

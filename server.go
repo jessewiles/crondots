@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -76,23 +77,45 @@ func writeMainPage(w http.ResponseWriter, r *http.Request, u User) {
 	}
 }
 
-func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
+func getSessionCookie(r *http.Request) (*http.Cookie, error) {
 	sessionCookie, err := r.Cookie("session")
 	if err != nil {
 		log.Print("No session cookie.")
-		writeMainPage(w, r, User{})
-		return
+		return nil, errors.New("no session cookie")
 	}
-	session, err := store.Get(r, sessionCookie.Value)
+	return sessionCookie, nil
+}
+
+func getSession(r *http.Request, s string) (*sessions.Session, error) {
+	session, err := store.Get(r, s)
 	if err != nil {
 		log.Print("No session.")
-		writeMainPage(w, r, User{})
-		return
+		return nil, errors.New("problem getting the session")
+	}
+	return session, nil
+}
+
+func decodeSession(r *http.Request) (*User, error) {
+	sessionCookie, err := getSessionCookie(r)
+	if err != nil {
+		return nil, err
+	}
+	session, err := getSession(r, sessionCookie.Value)
+	if err != nil {
+		return nil, err
 	}
 	val := session.Values["user"]
 	user, ok := val.(*User)
 	if user != nil && !ok {
 		log.Print("Problem decoding the session")
+		return nil, errors.New("problem decoding the session")
+	}
+	return user, nil
+}
+
+func siteIndexHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := decodeSession(r)
+	if err != nil {
 		writeMainPage(w, r, User{})
 		return
 	}
@@ -202,6 +225,33 @@ func uuidHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(auuid)
 }
 
+func timelinesHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := decodeSession(r)
+	if err != nil {
+		// write an empty list and bug out if there's no user
+		payload := []byte("[]")
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Length", strconv.Itoa(len(payload)))
+		w.Write(payload)
+		return
+	}
+
+	db := context.Get(r, "db").(*mgo.Session)
+
+	var timelines []Timeline
+
+	log.Printf("%#v", user)
+	err = db.DB("cdots").C("timeline").Find(bson.M{"user": user.ID}).All(&timelines)
+
+	payload, err := json.Marshal(timelines)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", strconv.Itoa(len(payload)))
+	w.Write(payload)
+}
+
 func init() {
 	gob.Register(&User{})
 }
@@ -219,6 +269,7 @@ func main() {
 	r.HandleFunc("/auuid", uuidHandler)
 	r.HandleFunc("/register", srv.WithData(registerHandler))
 	r.HandleFunc("/signin", srv.WithData(signinHandler))
+	r.HandleFunc("/timelines", srv.WithData(timelinesHandler))
 	websrv := &http.Server{
 		Handler: r,
 		Addr:    ":8080",
