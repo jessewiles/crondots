@@ -4,8 +4,21 @@ define(['jquery'], function($) {
             if (true) {
                 $.ajax({
                     url: '/timelines',
+                    async: false,
                     success: function(result) {
-                        // do something
+                        var output = [];
+                        for (var i = 0; i < result.length; i++) {
+                            output.push(
+                                '<li><a href="#/view/'
+                                +result[i]+
+                                '">'
+                                +result[i]+
+                                '</a></li>'
+                            );
+                        }
+                        $('#timelines').html(
+                            output.join('\n')
+                        );
                     }
                 })
             }

@@ -149,11 +149,7 @@
             <a href="#/signin">Sign In</a> | <a href="#/register">Register</a>
             {{/unless}}
           </div>
-          <ul>
-            {{#each timelines}}
-            <li><a href="#/view/{{this}}">{{this}}</a></li>
-            {{/each}}
-          </ul>
+          <ul id="timelines"><!--o--></ul>
         </script>
 
         <script id="t-view" type="text/x-handlebars-template">

@@ -226,30 +226,32 @@ func uuidHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func timelinesHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := decodeSession(r)
-	if err != nil {
-		// write an empty list and bug out if there's no user
-		payload := []byte("[]")
+	if r.Method == "GET" {
+		user, err := decodeSession(r)
+		if err != nil {
+			// write an empty list and bug out if there's no user
+			payload := []byte("[]")
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Content-Length", strconv.Itoa(len(payload)))
+			w.Write(payload)
+			return
+		}
+
+		db := context.Get(r, "db").(*mgo.Session)
+
+		var timelines []Timeline
+
+		log.Printf("%#v", user)
+		err = db.DB("cdots").C("timeline").Find(bson.M{"user": user.ID}).All(&timelines)
+
+		payload, err := json.Marshal(timelines)
+
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Content-Length", strconv.Itoa(len(payload)))
 		w.Write(payload)
-		return
 	}
-
-	db := context.Get(r, "db").(*mgo.Session)
-
-	var timelines []Timeline
-
-	log.Printf("%#v", user)
-	err = db.DB("cdots").C("timeline").Find(bson.M{"user": user.ID}).All(&timelines)
-
-	payload, err := json.Marshal(timelines)
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", strconv.Itoa(len(payload)))
-	w.Write(payload)
 }
 
 func init() {
