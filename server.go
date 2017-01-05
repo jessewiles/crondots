@@ -58,13 +58,6 @@ type FrontPage struct {
 	User User
 }
 
-// User - blah blah blah
-type User struct {
-	ID       bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Email    string        `json:"email"`
-	Password string        `json:"password"`
-}
-
 func writeMainPage(w http.ResponseWriter, r *http.Request, u User) {
 	t, err := template.New("main.html").Delims("[[", "]]").ParseFiles("templates/main.html")
 	if err != nil {
