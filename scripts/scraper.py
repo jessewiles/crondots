@@ -1,15 +1,9 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-output tab separated lines with the following fields:
-    0 url
-    1 text
-    2 imageurl
+output tuples of matched date lines in wikipedia articles
 """
 
-from os import path
-from sys import stdout
-import codecs
 from bs4 import BeautifulSoup
 import requests
 import re
