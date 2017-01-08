@@ -12,55 +12,28 @@ from sys import stdout
 import codecs
 from bs4 import BeautifulSoup
 import requests
+import re
 
 
-streamWriter = codecs.lookup('utf-8')[-1]
-stdout = streamWriter(stdout)
+DATE_EXPRESSION = re.compile('([^\.]*)([JFMASOND][a-z]+[\ ,0-9]*[1-2][0-9][0-9][0-9])([^\.]*)\.', re.MULTILINE)
 
-# a place to store the links we find
-links = []
+urls = [
+    'https://en.wikipedia.org/wiki/Joni_Mitchell',
+    'https://en.wikipedia.org/wiki/Tom_Petty',
+    'https://en.wikipedia.org/wiki/Paul_Simon',
+    'https://en.wikipedia.org/wiki/American_Revolutionary_War'
+]
 
-r = requests.get('https://www.python.org/')
-page = r.text
-soup = BeautifulSoup(page)
-for link in soup.findAll('a', href=True):
-    # skip useless links
-    if link['href'] == '' or link['href'].startswith('#'):
-        continue
-    # initialize the link
-    thisLink = {
-        'url': link['href'],
-        'title': link.string,
-        'image': '',
-    }
-    # see if the link contains an image
-    img = link.find('img', src=True)
-    if img:
-        thisLink['image'] = img['src']
-        if thisLink['title'] is None:
-            # look for a title here if none exists
-            if 'title' in img:
-                thisLink['title'] = img['title']
-            elif 'alt' in img:
-                thisLink['title'] = img['alt']
-            else:
-                thisLink['title'] = path.basename(img['src'])
+dates = []
+for url in urls:
+    dates.append([('', '')])
+    dates.append([(url, ' ***')])
+    dates.append([('', '')])
+    r = requests.get(url)
+    page = r.text
+    soup = BeautifulSoup(page, "html5lib")
+    print('Processing: {0}'.format(url))
+    for p in soup.findAll('p'):
+        dates.append(DATE_EXPRESSION.findall(p.text))
 
-    if thisLink['title'] is None:
-        # check for text inside the link
-        if len(link.contents):
-            thisLink['title'] = ' '.join(link.stripped_strings)
-    if thisLink['title'] is None:
-        # if there's *still* no title (empty tag), skip it
-        continue
-    # convert to something immutable for storage
-    hashableLink = (thisLink['url'].strip(),
-                    thisLink['title'].strip(),
-                    thisLink['image'].strip())
-    # store the result
-    if hashableLink not in links:
-        links.append(hashableLink)
-
-# print the results
-for link in links:
-    stdout.write('\t'.join(link) + '\n')
+print(u'\n'.join([unicode(d[0]) for d in dates if len(d) > 0]))
